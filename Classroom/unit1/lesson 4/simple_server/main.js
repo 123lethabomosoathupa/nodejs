@@ -1,8 +1,8 @@
 "use strict";
 
-const port = 3000,
-    http = require("http"),
-    httpStatus = require("http-status-codes"),
+const port = 3000;
+    http = require("http");
+    httpStatus = require("http-status-codes");
     app = http.createServer((request, response) => {
         console.log("Received an incoming request!");
         response.writeHead(httpStatus.OK, {
