@@ -1,23 +1,13 @@
-"use strict"; // Enforces strict mode to catch common coding mistakes
-
-
-// Define the port where the server will listen
 const port = 3000;
+const http = require("http");
+const httpStatus = require("http-status-codes");
 
-// Import required modules
-const http = require("http"); // Built-in Node.js HTTP module
-const httpStatus = require("http-status-codes"); // Provides named HTTP status codes
-
-// Create a new HTTP server instance
 const app = http.createServer();
 
-const getJSONString = (obj) => {
+const getJSONString = obj => {
     return JSON.stringify(obj, null, 2);
 };
 
-
-
-// Set up an event listener for incoming HTTP requests
 app.on("request", (req, res) => {
     let body = [];
     req.on("data", (bodyData) => {
@@ -30,21 +20,14 @@ app.on("request", (req, res) => {
     console.log(`Method: ${getJSONString(req.method)}`);
     console.log(`URL: ${getJSONString(req.url)}`);
     console.log(`Headers: ${getJSONString(req.headers)}`);
-    // Set the HTTP response headers (status and content type)
+
     res.writeHead(httpStatus.OK, {
-        "Content-Type": "text/html" // Tells the browser we're sending HTML
+        "Content-Type": "text/html"
     });
 
-
-    // Define the message that will be sent back to the client
-    const responseMessage = "<h1>This will show on the screen.</h1>";
-
-    // End the response and send the message to the browser
+    let responseMessage = "<h1>This will show on the screen.</h1>";
     res.end(responseMessage);
 });
 
-// Start the server and have it listen on the defined port
 app.listen(port);
-
-// Log a confirmation message to the console
 console.log(`The server has started and is listening on port number: ${port}`);
