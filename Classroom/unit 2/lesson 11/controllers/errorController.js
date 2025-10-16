@@ -1,3 +1,5 @@
+"use strict";
+
 const httpStatus = require("http-status-codes");
 
 // Log errors to console
