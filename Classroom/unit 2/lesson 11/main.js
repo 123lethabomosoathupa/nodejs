@@ -1,14 +1,14 @@
 const express = require("express");
 const app = express();
+app.use(express.static("public"));
+
 const homeController = require("./controllers/homeController");
 const layouts = require("express-ejs-layouts");
 const errorController = require("./controllers/errorController");
 
-// Middleware order matters:
 app.use(errorController.logErrors);
 app.use(errorController.respondNoResourceFound);
 app.use(errorController.respondInternalError);
-app.use(express.static("public"));
 
 app.set("port", process.env.PORT || 3000);
 app.set("view engine", "ejs");

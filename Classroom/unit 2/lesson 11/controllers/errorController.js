@@ -1,23 +1,24 @@
 "use strict";
 
 const httpStatus = require("http-status-codes");
+const path = require("path");
 
-// Log errors to console
+// Log any error that occurs
 exports.logErrors = (error, req, res, next) => {
   console.error(error.stack);
   next(error);
 };
 
-// Respond when a route isn't found
+// Custom 404 handler
 exports.respondNoResourceFound = (req, res) => {
-  let errorCode = httpStatus.NOT_FOUND;
+  let errorCode = httpStatus.StatusCodes.NOT_FOUND;
   res.status(errorCode);
-  res.send(`${errorCode} | The page does not exist!`);
+  res.sendFile(path.join(__dirname, "../public/404.html"));
 };
 
-// Respond when a server error occurs
+// 500 Internal Server Error handler
 exports.respondInternalError = (error, req, res, next) => {
-  let errorCode = httpStatus.INTERNAL_SERVER_ERROR;
+  let errorCode = httpStatus.StatusCodes.INTERNAL_SERVER_ERROR;
   console.log(`ERROR occurred: ${error.stack}`);
   res.status(errorCode);
   res.send(`${errorCode} | Sorry, our application is experiencing a problem!`);
