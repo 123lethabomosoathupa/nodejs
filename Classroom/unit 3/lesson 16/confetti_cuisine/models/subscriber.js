@@ -1,9 +1,11 @@
-"use strict";
-const mongoose = require("mongoose");
-const subscriberSchema = new mongoose.Schema({
+const mongoose = require('mongoose');
+
+//schema creation
+const subscriberSchema = mongoose.Schema({
+    //schema properties
     name: String,
     email: String,
-    zipCode: Number,
-    userAccount: { type: mongoose.Schema.Types.ObjectId, ref: "User" }
+    zipCode: Number
 });
+
 module.exports = mongoose.model("Subscriber", subscriberSchema);

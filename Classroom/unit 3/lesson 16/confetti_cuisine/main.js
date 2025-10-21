@@ -1,78 +1,53 @@
-/*
-========================================
- main.js
-----------------------------------------
- SUMMARY:
- This file is the main entry point for the Express.js application.
- It sets up:
-  - Express server configuration
-  - Middleware (EJS layouts, body parsing, logging)
-  - Route handling (GET and POST)
-  - Controller connections
-  - Server startup on the configured port
-========================================
-*/
+"use strict";
 
-// Import the Express framework
 const express = require("express");
-
-// Create an Express application instance
 const app = express();
-
-// Import the controller module that handles route logic
+const errorController = require("./controllers/errorController");
 const homeController = require("./controllers/homeController");
-
-// Import the EJS layouts middleware for using layout templates
 const layouts = require("express-ejs-layouts");
+const mongoose = require("mongoose");
+const Subscriber = require("./models/subscriber");
+const subscriberController = require("./controllers/subscribersController");
 
-// === APP CONFIGURATION ===
-
-// Set the port for the server (use environment variable or default to 3000)
-app.set("port", process.env.PORT || 3000);
-
-// Set EJS as the view engine for rendering dynamic HTML pages
-app.set("view engine", "ejs");
-
-// === MIDDLEWARE SETUP ===
-
-// Enable EJS layouts middleware so views can share a common layout structure
-app.use(layouts);
-
-// Middleware to parse URL-encoded data (used for form submissions)
-app.use(
-  express.urlencoded({
-    extended: false
-  })
+//connecting to database
+mongoose.connect("mongodb://0.0.0.0:27017/confetti_cuisine",
+  { useNewUrlParser: true }
 );
 
-// Middleware to parse JSON data (used for APIs or AJAX requests)
-app.use(express.json());
+const db = mongoose.connection;
 
-// Custom middleware to log each incoming request URL
-app.use((req, res, next) => {
-  console.log(`Request made to: ${req.url}`);
-  next(); // Pass control to the next middleware or route handler
+db.once("open", () => {
+  console.log("Successfully connected to MongoDB using Mongoose!");
+
 });
 
-// === ROUTES ===
+app.set("port", process.env.PORT || 3000);
+app.set("view engine", "ejs");
 
-// Route for GET requests to /items/:vegetable
-app.get("/items/:vegetable", homeController.sendReqParam);
+app.use(express.static("public"));
+app.use(layouts);
+app.use(
+  express.urlencoded({
+    extended: false,
+  })
+);
+app.use(express.json());
 
-// Route for POST requests to the root URL ("/")
-app.post("/", homeController.sendPost);
-
-// Route for GET requests to /name/:myName
-app.get("/name/:myName", homeController.respondWithName);
-
-// Additional routes for your courses and contact forms
-app.get("/courses", homeController.showCourses);
-app.get("/contact", homeController.showSignUp);
+app.get("/", homeController.index);//index.ejs
+app.get("/courses", homeController.showCourses);//courses.ejs
 app.post("/contact", homeController.postedSignUpForm);
 
-// === START SERVER ===
+app.get("/subscribers", subscriberController.getAllSubscribers, (req, res, next) => {
+    res.render("subscribers", {subscribers: req.data});
+  }//subscribers.ejs
+);
 
-// Start the server and listen on the configured port
+app.get("/contact", subscriberController.getSubscriptionPage);
+app.post("/subscribe", subscriberController.saveSubscriber);
+
+app.use(errorController.respondNoResourceFound);
+app.use(errorController.respondInternalError);
+
 app.listen(app.get("port"), () => {
   console.log(`Server running at http://localhost:${app.get("port")}`);
 });
