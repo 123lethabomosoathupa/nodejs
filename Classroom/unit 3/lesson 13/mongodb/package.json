@@ -4,7 +4,8 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node main.js"
   },
   "author": "Diddy",
   "license": "ISC",
@@ -13,7 +14,7 @@
     "express": "^5.1.0",
     "express-ejs-layouts": "^2.5.1",
     "http-status-codes": "^2.3.0",
-    "mongodb": "^6.20.0",
+    "mongodb": "^3.6.3",
     "nodemon": "^3.1.10"
   }
 }
