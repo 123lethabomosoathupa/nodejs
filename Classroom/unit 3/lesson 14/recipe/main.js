@@ -19,12 +19,12 @@ mongoose.connect("mongodb://127.0.0.1:27017/recipe_db")
 // CREATE & QUERY DOCUMENTS
 // -------------------------------
 Subscriber.create({
-  name: "Jada Mathele",
-  email: "jada@mathele.com"
+  name: "Lethabo Mosoathupa",
+  email: "lethabo.mosoathupa8@gmail.com"
 })
   .then(savedDoc => {
     console.log("✅ Document saved:", savedDoc);
-    return Subscriber.find({ name: "Jada Mathele" });
+    return Subscriber.find({ name: "Lethabo Mosoathupa" });
   })
   .then(docs => {
     console.log("📄 Query results:", docs);
