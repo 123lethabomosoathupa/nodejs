@@ -1,24 +1,22 @@
-"use strict";
-const mongoose = require("mongoose");
-const userSchema = new mongoose.Schema({
-    name: {
-        first: { type: String, trim: true },
-        last: { type: String, trim: true }
-    },
-    email: {
-        type: String,
-        required: true,
-        lowercase: true,
-        unique: true
-    },
-    zipCode: {
-        type: Number,
-        min: [1000, "Zip code too short"],
-        max: 99999
-    },
-    courses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Course" }]
+"use strict"; // Enforces strict mode for safer, cleaner JavaScript
+
+// === Import Mongoose Library ===
+const mongoose = require('mongoose');
+
+// === Define the Subscriber Schema ===
+// The schema determines the structure of documents stored in the "subscribers" collection.
+const subscriberSchema = mongoose.Schema({
+    // Subscriber's full name
+    name: String,
+
+    // Subscriber's email address
+    email: String,
+
+    // Subscriber's postal or ZIP code
+    zipCode: Number
 });
-userSchema.virtual("fullName").get(function () {
-    return `${this.name.first} ${this.name.last}`;
-});
-module.exports = mongoose.model("User", userSchema);
+
+// === Export the Subscriber Model ===
+// Creates a Mongoose model named "Subscriber" using the schema above.
+// Mongoose will automatically map this model to the "subscribers" collection in MongoDB.
+module.exports = mongoose.model("Subscriber", subscriberSchema);
