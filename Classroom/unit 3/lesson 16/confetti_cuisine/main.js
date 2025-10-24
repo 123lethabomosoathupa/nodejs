@@ -1,5 +1,27 @@
 "use strict"; // Enforces strict mode for safer, cleaner JavaScript
 
+/*
+===========================================
+ CONFETTI CUISINE APP — SERVER SETUP SUMMARY
+-------------------------------------------
+This code sets up the Confetti Cuisine web application using Node.js, Express, and MongoDB (via Mongoose).
+
+✅ MAIN GOALS:
+1. Establish a connection to a MongoDB database.
+2. Configure Express with EJS templates and layouts.
+3. Serve static files and handle form data (URL-encoded & JSON).
+4. Define routes for:
+   - Homepage and courses (via homeController)
+   - Subscriber management (via subscribersController)
+5. Handle user subscriptions and display subscribers.
+6. Implement error handling for 404 and 500 responses.
+7. Start the server on the defined port (default: 3000).
+
+In short, this file acts as the main entry point for the Confetti Cuisine app, 
+linking together controllers, views, and the database.
+===========================================
+*/
+
 // === Import Required Modules ===
 const express = require("express");                        // Web framework for building the server
 const app = express();                                     // Initialize Express app

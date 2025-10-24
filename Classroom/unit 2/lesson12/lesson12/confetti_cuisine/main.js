@@ -1,75 +1,56 @@
-/*
-========================================
- main.js
-----------------------------------------
- SUMMARY:
- This file is the main entry point for the Express.js application.
- It sets up:
-  - Express server configuration
-  - Middleware (EJS layouts, body parsing, logging)
-  - Route handling (GET and POST)
-  - Controller connections
-  - Server startup on the configured port
-========================================
-*/
+"use strict"; // Enforces strict mode for safer, cleaner JavaScript
 
-// Import the Express framework
-const express = require("express");
+// === Import Required Modules ===
+const express = require("express"),               // Web framework for building server and routing
+  app = express(),                                // Initialize Express app
+  homeController = require("./controllers/homeController"), // Handles homepage and courses routes
+  errorController = require("./controllers/errorController"), // Handles errors like 404 and 500
+  layouts = require("express-ejs-layouts");       // EJS layout middleware for template structure
 
-// Create an Express application instance
-const app = express();
+// === View Engine Setup ===
+app.set("view engine", "ejs"); // Use EJS as the templating engine
 
-// Import the controller module that handles route logic
-const homeController = require("./controllers/homeController");
+// === App Configuration ===
+app.set("port", process.env.PORT || 3000);       // Set server port (default 3000)
 
-// Import the EJS layouts middleware for using layout templates
-const layouts = require("express-ejs-layouts");
-
-// === APP CONFIGURATION ===
-
-// Set the port for the server (use environment variable or default to 3000)
-app.set("port", process.env.PORT || 3000);
-
-// Set EJS as the view engine for rendering dynamic HTML pages
-app.set("view engine", "ejs");
-
-// === MIDDLEWARE SETUP ===
-
-// Enable EJS layouts middleware so views can share a common layout structure
-app.use(layouts);
-
-// Middleware to parse URL-encoded data (used for form submissions)
+// === Middleware ===
+// Parse URL-encoded form data into req.body
 app.use(
   express.urlencoded({
-    extended: false
+    extended: false // Do not allow nested objects
   })
 );
-
-// Middleware to parse JSON data (used for APIs or AJAX requests)
+// Parse JSON request bodies
 app.use(express.json());
-
-// Custom middleware to log each incoming request URL
-app.use((req, res, next) => {
-  console.log(`Request made to: ${req.url}`);
-  next(); // Pass control to the next middleware or route handler
-});
+// Enable EJS layouts
+app.use(layouts);
+// Serve static files from the "public" folder (CSS, images, JS)
+app.use(express.static("public"));
 
 // === ROUTES ===
 
-// Route for GET requests to /items/:vegetable
-// Example: /items/carrot → handled by homeController.sendReqParam
-app.get("/items/:vegetable", homeController.sendReqParam);
+// Home page route – renders index.ejs
+app.get("/", (req, res) => {
+  res.render("index");
+});
 
-// Route for POST requests to the root URL ("/")
-app.post("/", homeController.sendPost);
+// Courses page – handled by homeController
+app.get("/courses", homeController.showCourses);
 
-// Route for GET requests to /name/:myName
-// Example: /name/Lethabo → handled by homeController.respondWithName
-app.get("/name/:myName", homeController.respondWithName);
+// Contact / Sign-Up page – shows the subscription form
+app.get("/contact", homeController.showSignUp);
+
+// Handle POST request when user submits the contact form
+app.post("/contact", homeController.postedSignUpForm);
+
+// === ERROR HANDLING ===
+// Handle 404 Page Not Found
+app.use(errorController.pageNotFoundError);
+// Handle 500 Internal Server Errors
+app.use(errorController.internalServerError);
 
 // === START SERVER ===
-
-// Start the server and listen on the configured port
+// Start listening on configured port
 app.listen(app.get("port"), () => {
   console.log(`Server running at http://localhost:${app.get("port")}`);
 });

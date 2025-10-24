@@ -1,45 +1,25 @@
-"use strict";
+"use strict"; // Enforces strict mode for safer, cleaner JavaScript
 
-/*
-=====================================================
-🧠 FILE SUMMARY: errorController.js
------------------------------------------------------
-This controller centralizes error handling for the app.
+// === Import HTTP Status Codes ===
+const httpStatus = require("http-status-codes"); // Provides constants like NOT_FOUND (404) and INTERNAL_SERVER_ERROR (500)
 
-🎯 GOALS:
-1. Handle all unhandled or invalid routes (404 errors).
-2. Handle unexpected internal server issues (500 errors).
-3. Provide clean, user-friendly error responses.
-4. Keep main app logic (in app.js or routes) cleaner by 
-   separating error-handling concerns.
-
-The two exported functions are:
-- pageNotFoundError: For 404 - Page Not Found.
-- internalServerError: For 500 - Internal Server Error.
-=====================================================
-*/
-
-const httpStatus = require("http-status-codes"); // Provides readable HTTP status constants
-
-// --------------------------------------------------
-// 404 - Page Not Found Handler
-// --------------------------------------------------
-// Triggered when no route matches the requested URL.
-// Renders an error page with a 404 status.
+// === 404 Error Handler (Page Not Found) ===
+// Handles requests to routes that do not exist.
+// Responds with HTTP 404 and renders a friendly error page.
 exports.pageNotFoundError = (req, res) => {
   let errorCode = httpStatus.NOT_FOUND; // 404
   res.status(errorCode);
-  res.render("error"); // Render 'error.ejs' (custom view)
+  // Render a custom error view (error.ejs) instead of sending plain text
+  res.render("error");
 };
 
-// --------------------------------------------------
-// 500 - Internal Server Error Handler
-// --------------------------------------------------
-// Triggered when something goes wrong in the server code.
-// Logs the stack trace for debugging and sends a friendly message.
+// === 500 Error Handler (Internal Server Error) ===
+// Handles unexpected server-side errors.
+// Logs the error stack and responds with a friendly message.
 exports.internalServerError = (error, req, res, next) => {
   let errorCode = httpStatus.INTERNAL_SERVER_ERROR; // 500
-  console.log(`ERROR occurred: ${error.stack}`); // Log detailed error info
+  console.log(`ERROR occurred: ${error.stack}`);    // Log detailed error info for debugging
   res.status(errorCode);
-  res.send(`${errorCode} | Sorry, our application is taking a nap!`); // Friendly message for the user
+  // Send a friendly error message to the client
+  res.send(`${errorCode} | Sorry, our application is taking a nap!`);
 };

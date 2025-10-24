@@ -1,13 +1,26 @@
-<div class="col-sm-6">
-  <img src="images/graph.png" alt="">
-</div>
-<div class="col-sm-6">
-  <h1>Subscribe!</h1>
-  <p>Enter your email if you're interested to learn more:</p>
-  <form class="subscription-form" action="/subscribe" method="post">
-    <input type="text" name="name" placeholder="Name">
-    <input type="text" name="email" placeholder="Email">
-    <input type="text" name="zipCode" placeholder="Zip Code" pattern="[0-9]{5}">
-    <input type="submit" name="submit">
-  </form>
+<!-- views/contact.ejs -->
+<div class="container mt-5">
+  <div class="row align-items-center">
+    <div class="col-sm-6">
+      <img src="/images/graph.png" alt="Growth graph" class="img-fluid rounded shadow">
+    </div>
+
+    <div class="col-sm-6">
+      <h1 class="mb-3">Subscribe!</h1>
+      <p>Enter your email if you're interested in learning more about our recipes and cooking courses:</p>
+
+      <form class="subscription-form mt-3" action="/subscribe" method="POST">
+        <div class="mb-3">
+          <input type="text" name="name" class="form-control" placeholder="Name" required>
+        </div>
+        <div class="mb-3">
+          <input type="email" name="email" class="form-control" placeholder="Email" required>
+        </div>
+        <div class="mb-3">
+          <input type="text" name="zipCode" class="form-control" placeholder="Zip Code" pattern="[0-9]{5}" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Subscribe</button>
+      </form>
+    </div>
+  </div>
 </div>
