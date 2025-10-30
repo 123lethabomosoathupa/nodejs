@@ -32,7 +32,7 @@ const errorController = require("./controllers/errorController"); // Handles err
 
 const MongoDB = require("mongodb").MongoClient,
   dbURL = "mongodb://localhost:27017",
-  dbName = "recipe_db";
+  dbName = "mongodb";
 MongoDB.connect(dbURL, (error, client) => {
   if (error) throw error;
   let db = client.db(dbName);
@@ -43,6 +43,7 @@ MongoDB.connect(dbURL, (error, client) => {
       console.log(data);
     });
 });
+
 // === ERROR HANDLING MIDDLEWARE ===
 // These middlewares are responsible for handling and responding to errors
 app.use(errorController.logErrors);               // Logs error details to the console
