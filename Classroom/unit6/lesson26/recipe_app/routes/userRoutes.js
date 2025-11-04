@@ -7,7 +7,7 @@ router.get("/", usersController.index, usersController.indexView);
 router.get("/new", usersController.new);
 router.post(
   "/create",
-  usersController.validate,
+  ...usersController.validate,  // ✅ Added spread operator
   usersController.create,
   usersController.redirectView
 );

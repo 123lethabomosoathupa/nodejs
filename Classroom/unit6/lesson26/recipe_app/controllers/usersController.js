@@ -1,5 +1,5 @@
 "use strict";
-
+const { body, validationResult } = require("express-validator");
 const User = require("../models/user"),
   passport = require("passport"),
   getUserParams = body => {
@@ -131,41 +131,47 @@ module.exports = {
     successRedirect: "/",
     successFlash: "Logged in!"
   }),
-  validate: (req, res, next) => {
-    req
-      .sanitizeBody("email")
-      .normalizeEmail({
-        all_lowercase: true
-      })
-      .trim();
-    req.check("email", "Email is invalid").isEmail();
-    req
-      .check("zipCode", "Zip code is invalid")
-      .notEmpty()
-      .isInt()
-      .isLength({
-        min: 5,
-        max: 5
-      })
-      .equals(req.body.zipCode);
-    req.check("password", "Password cannot be empty").notEmpty();
+  validate: [
+  body("email")
+    .normalizeEmail({ all_lowercase: true })
+    .trim()
+    .isEmail()
+    .withMessage("Email is invalid"),
+  
+  body("zipCode")
+    .notEmpty()
+    .withMessage("Zip code cannot be empty")
+    .isInt()
+    .withMessage("Zip code must be a number")
+    .isLength({ min: 5, max: 5 })
+    .withMessage("Zip code must be 5 digits"),
+  
+  body("password")
+    .notEmpty()
+    .withMessage("Password cannot be empty"),
 
-    req.getValidationResult().then(error => {
-      if (!error.isEmpty()) {
-        let messages = error.array().map(e => e.msg);
-        req.skip = true;
-        req.flash("error", messages.join(" and "));
-        res.locals.redirect = "/users/new";
-        next();
-      } else {
-        next();
-      }
-    });
-  },
-  logout: (req, res, next) => {
-    req.logout();
+  // Validation result handler
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      let messages = errors.array().map(e => e.msg);
+      req.skip = true;
+      req.flash("error", messages.join(" and "));
+      res.locals.redirect = "/users/new";
+      next();
+    } else {
+      next();
+    }
+  }
+],
+ logout: (req, res, next) => {
+  req.logout((err) => {
+    if (err) {
+      return next(err);
+    }
     req.flash("success", "You have been logged out!");
     res.locals.redirect = "/";
     next();
-  }
+  });
+},
 };
