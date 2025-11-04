@@ -1,54 +1,59 @@
-"use strict";
+"use strict"; // Enforce strict mode for safer JavaScript
 
-const express = require("express"),
-  app = express(),
-  layouts = require("express-ejs-layouts"),
-  mongoose = require("mongoose"),
-  errorController = require("./controllers/errorController"),
-  homeController = require("./controllers/homeController"),
-  subscribersController = require("./controllers/subscribersController"),
-  usersController = require("./controllers/usersController"),
-  coursesController = require("./controllers/coursesController"),
-  Subscriber = require("./models/subscriber");
+// Import required modules and initialize Express app
+const express = require("express"), // Express framework
+  app = express(), // Initialize Express app
+  layouts = require("express-ejs-layouts"), // Layouts support for EJS
+  mongoose = require("mongoose"), // Mongoose for MongoDB
+  errorController = require("./controllers/errorController"), // Custom error handlers
+  homeController = require("./controllers/homeController"), // Home page controller
+  subscribersController = require("./controllers/subscribersController"), // Subscribers controller
+  usersController = require("./controllers/usersController"), // Users controller
+  coursesController = require("./controllers/coursesController"), // Courses controller
+  Subscriber = require("./models/subscriber"); // Subscriber model
 
 // === Connect to MongoDB ===
-mongoose.connect("mongodb://localhost:27017/recipe_db")
-  .then(() => console.log("✅ Connected to MongoDB"))
-  .catch(err => console.error("❌ Connection error:", err));
+mongoose.connect("mongodb://localhost:27017/recipe_db") // Connect to local MongoDB database
+  .then(() => console.log("✅ Connected to MongoDB")) // Success message
+  .catch(err => console.error("❌ Connection error:", err)); // Error message if connection fails
 
 // === Optional: confirm connection ===
-const db = mongoose.connection;
-db.once("open", () => {
+const db = mongoose.connection; // Get default connection
+db.once("open", () => { // Listen for connection open event
   console.log("Successfully connected to MongoDB using Mongoose!");
 });
 
 // === Express App Setup ===
-app.set("port", process.env.PORT || 3000);
-app.set("view engine", "ejs");
+app.set("port", process.env.PORT || 3000); // Set port (from environment or default 3000)
+app.set("view engine", "ejs"); // Set EJS as the templating engine
 
-app.use(express.static("public"));
-app.use(layouts);
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
+// === Middleware Setup ===
+app.use(express.static("public")); // Serve static files from "public" folder
+app.use(layouts); // Use express-ejs-layouts for layout support
+app.use(express.urlencoded({ extended: false })); // Parse URL-encoded form data
+app.use(express.json()); // Parse JSON request bodies
 
-// === Middleware & Controllers ===
-app.use(homeController.logRequestPaths);
+// === Custom Middleware & Controllers ===
+app.use(homeController.logRequestPaths); // Log request paths for debugging
 
-app.get("/", homeController.index);
-app.get("/contact", homeController.getSubscriptionPage);
+// Home routes
+app.get("/", homeController.index); // Home page route
+app.get("/contact", homeController.getSubscriptionPage); // Contact / subscription page
 
-app.get("/users", usersController.index, usersController.indexView);
-app.get("/subscribers", subscribersController.index, subscribersController.indexView);
-app.get("/courses", coursesController.index, coursesController.indexView);
+// User, Subscriber, and Course routes
+app.get("/users", usersController.index, usersController.indexView); // List users
+app.get("/subscribers", subscribersController.index, subscribersController.indexView); // List subscribers
+app.get("/courses", coursesController.index, coursesController.indexView); // List courses
 
-app.post("/subscribe", subscribersController.saveSubscriber);
+// Handle form submission for subscribing
+app.post("/subscribe", subscribersController.saveSubscriber); // Save new subscriber
 
-// === Error Handlers ===
-app.use(errorController.logErrors);
-app.use(errorController.respondNoResourceFound);
-app.use(errorController.respondInternalError);
+// === Error Handling Middleware ===
+app.use(errorController.logErrors); // Log errors to console or file
+app.use(errorController.respondNoResourceFound); // Handle 404 errors
+app.use(errorController.respondInternalError); // Handle 500 server errors
 
-// === Start Server ===
-app.listen(app.get("port"), () => {
-  console.log(`🚀 Server running at http://localhost:${app.get("port")}`);
+// === Start the Server ===
+app.listen(app.get("port"), () => { // Listen on specified port
+  console.log(`🚀 Server running at http://localhost:${app.get("port")}`); // Log server start
 });

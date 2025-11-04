@@ -1,49 +1,46 @@
 "use strict";
 
-const User = require("../models/user");
-const { body, validationResult } = require("express-validator");
-const passport = require("passport");
-
-
-const getUserParams = (body) => {
-  return {
-    name: {
-      first: body.first,
-      last: body.last,
-    },
-    email: body.email,
-    password: body.password,
-    zipCode: body.zipCode,
+const User = require("../models/user"),
+  passport = require("passport"),
+  getUserParams = body => {
+    return {
+      name: {
+        first: body.first,
+        last: body.last
+      },
+      email: body.email,
+      password: body.password,
+      zipCode: body.zipCode
+    };
   };
-};
 
 module.exports = {
   index: (req, res, next) => {
     User.find()
-      .then((users) => {
+      .then(users => {
         res.locals.users = users;
         next();
       })
-      .catch((error) => {
+      .catch(error => {
         console.log(`Error fetching users: ${error.message}`);
         next(error);
       });
   },
   indexView: (req, res) => {
-    res.render("users/index", {
-      flashMessages: {
-        success: "Loaded all users!",
-      },
-    });
+    if (req.query.format === "json") {
+      res.json(res.locals.users);     // ✅ Changed to users
+    } else {
+      res.render("users/index", {      // ✅ Changed to users/index
+        users: res.locals.users        // ✅ Pass users data
+      });
+    }
   },
   new: (req, res) => {
     res.render("users/new");
   },
   create: (req, res, next) => {
     if (req.skip) return next();
-
     let newUser = new User(getUserParams(req.body));
-
     User.register(newUser, req.body.password, (error, user) => {
       if (user) {
         req.flash("success", `${user.fullName}'s account created successfully!`);
@@ -56,7 +53,6 @@ module.exports = {
       }
     });
   },
-
   redirectView: (req, res, next) => {
     let redirectPath = res.locals.redirect;
     if (redirectPath) res.redirect(redirectPath);
@@ -65,11 +61,11 @@ module.exports = {
   show: (req, res, next) => {
     let userId = req.params.id;
     User.findById(userId)
-      .then((user) => {
+      .then(user => {
         res.locals.user = user;
         next();
       })
-      .catch((error) => {
+      .catch(error => {
         console.log(`Error fetching user by ID: ${error.message}`);
         next(error);
       });
@@ -80,12 +76,12 @@ module.exports = {
   edit: (req, res, next) => {
     let userId = req.params.id;
     User.findById(userId)
-      .then((user) => {
+      .then(user => {
         res.render("users/edit", {
-          user: user,
+          user: user
         });
       })
-      .catch((error) => {
+      .catch(error => {
         console.log(`Error fetching user by ID: ${error.message}`);
         next(error);
       });
@@ -95,33 +91,33 @@ module.exports = {
       userParams = {
         name: {
           first: req.body.first,
-          last: req.body.last,
+          last: req.body.last
         },
         email: req.body.email,
         password: req.body.password,
-        zipCode: req.body.zipCode,
+        zipCode: req.body.zipCode
       };
     User.findByIdAndUpdate(userId, {
-      $set: userParams,
+      $set: userParams
     })
-      .then((user) => {
+      .then(user => {
         res.locals.redirect = `/users/${userId}`;
         res.locals.user = user;
         next();
       })
-      .catch((error) => {
+      .catch(error => {
         console.log(`Error updating user by ID: ${error.message}`);
         next(error);
       });
   },
   delete: (req, res, next) => {
     let userId = req.params.id;
-    User.findByIdAndRemove(userId)
+    User.findByIdAndDelete(userId)  // Changed from findByIdAndRemove
       .then(() => {
         res.locals.redirect = "/users";
         next();
       })
-      .catch((error) => {
+      .catch(error => {
         console.log(`Error deleting user by ID: ${error.message}`);
         next();
       });
@@ -129,31 +125,47 @@ module.exports = {
   login: (req, res) => {
     res.render("users/login");
   },
-  
   authenticate: passport.authenticate("local", {
     failureRedirect: "/users/login",
     failureFlash: "Failed to login.",
     successRedirect: "/",
     successFlash: "Logged in!"
   }),
+  validate: (req, res, next) => {
+    req
+      .sanitizeBody("email")
+      .normalizeEmail({
+        all_lowercase: true
+      })
+      .trim();
+    req.check("email", "Email is invalid").isEmail();
+    req
+      .check("zipCode", "Zip code is invalid")
+      .notEmpty()
+      .isInt()
+      .isLength({
+        min: 5,
+        max: 5
+      })
+      .equals(req.body.zipCode);
+    req.check("password", "Password cannot be empty").notEmpty();
+
+    req.getValidationResult().then(error => {
+      if (!error.isEmpty()) {
+        let messages = error.array().map(e => e.msg);
+        req.skip = true;
+        req.flash("error", messages.join(" and "));
+        res.locals.redirect = "/users/new";
+        next();
+      } else {
+        next();
+      }
+    });
+  },
   logout: (req, res, next) => {
     req.logout();
     req.flash("success", "You have been logged out!");
     res.locals.redirect = "/";
     next();
-  },
-
-};
-exports.validate = [
-  body("email").isEmail().withMessage("Email must be valid"),
-  body("zipCode").isPostalCode("any").withMessage("Invalid zip code"),
-  body("password").isLength({ min: 8 }).withMessage("Password must be at least 8 characters"),
-  (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      req.flash("error", errors.array().map(e => e.msg).join(" "));
-      res.locals.redirect = "/users/new";
-      next();
-    } else next();
   }
-];
+};
