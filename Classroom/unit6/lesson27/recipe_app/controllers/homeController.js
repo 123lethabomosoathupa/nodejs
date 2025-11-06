@@ -1,10 +1,14 @@
 "use strict";
 
 module.exports = {
+  getSubscriptionPage: (req, res) => {
+    res.render("contact");
+  },
   index: (req, res) => {
     res.render("index");
   },
-	contact: (req, res) => {
-		res.render("contact");
-	}
+  logRequestPaths: (req, res, next) => {
+    console.log(`request made to: ${req.url}`);
+    next();
+  }
 };
