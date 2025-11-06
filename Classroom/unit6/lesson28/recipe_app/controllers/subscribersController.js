@@ -20,6 +20,7 @@ module.exports = {
   },
 
   saveSubscriber: (req, res) => {
+    console.log("Received POST request for subscribe:", req.body);
     let newSubscriber = new Subscriber({
       name: req.body.name,
       email: req.body.email,

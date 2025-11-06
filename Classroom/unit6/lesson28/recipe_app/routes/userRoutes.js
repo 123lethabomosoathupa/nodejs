@@ -1,16 +1,11 @@
 "use strict";
 
-const router = require("express").Router(),
-  usersController = require("../controllers/usersController");
+const router = require("express").Router();
+const usersController = require("../controllers/usersController");
 
 router.get("/", usersController.index, usersController.indexView);
 router.get("/new", usersController.new);
-router.post(
-  "/create",
-  ...usersController.validate,  // ✅ Added spread operator
-  usersController.create,
-  usersController.redirectView
-);
+router.post("/create",usersController.validate,usersController.create,usersController.redirectView);
 router.get("/login", usersController.login);
 router.post("/login", usersController.authenticate);
 router.get("/logout", usersController.logout, usersController.redirectView);

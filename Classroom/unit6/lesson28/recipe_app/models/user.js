@@ -1,9 +1,9 @@
 "use strict";
-const randToken = require("rand-token"),
-  mongoose = require("mongoose"),
+
+const mongoose = require("mongoose"),
   { Schema } = mongoose,
   Subscriber = require("./subscriber"),
-  bcrypt = require("bcrypt"),
+
   passportLocalMongoose = require("passport-local-mongoose"),
   userSchema = new Schema(
     {
@@ -39,11 +39,11 @@ const randToken = require("rand-token"),
     }
   );
 
-userSchema.virtual("fullName").get(function () {
+userSchema.virtual("fullName").get(function() {
   return `${this.name.first} ${this.name.last}`;
 });
 
-userSchema.pre("save", function (next) {
+userSchema.pre("save", function(next) {
   let user = this;
   if (user.subscribedAccount === undefined) {
     Subscriber.findOne({
@@ -62,6 +62,8 @@ userSchema.pre("save", function (next) {
   }
 });
 
+//Passport.js automatically takes care of password storage
+//Plugin modifies schema behind the scenes to add hash & salt fields to User model in place of normal password field
 userSchema.plugin(passportLocalMongoose, {
   usernameField: "email"
 });

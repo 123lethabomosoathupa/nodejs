@@ -1,9 +1,10 @@
 "use strict";
 
 const Course = require("../models/course");
+const httpStatus = require("http-status-codes");
+const User = require("../models/user");
 
 module.exports = {
-  // List all courses
   index: (req, res, next) => {
     Course.find({})
       .then(courses => {
@@ -15,27 +16,24 @@ module.exports = {
         next(error);
       });
   },
-
-  // Render courses index view or JSON
   indexView: (req, res) => {
-    if (req.query.format === "json") {
-      res.json(res.locals.courses);
-    } else {
-      res.render("courses/index", { courses: res.locals.courses });
-    }
-  },
+    // if (req.query.format === "json") {
+    //   res.json(res.locals.courses);
+    // } else {
+    // res.render("courses/index");
+    // }
 
-  // Render form for new course
+    res.render("courses/index");
+  },
   new: (req, res) => {
-    res.render("courses/new"); // new course form
+    res.render("courses/new");
   },
 
-  // Create a new course
   create: (req, res, next) => {
     let courseParams = {
       title: req.body.title,
       description: req.body.description,
-      items: req.body.items.split(","), // store as array
+      items: [req.body.items.split(",")],
       zipCode: req.body.zipCode
     };
     Course.create(courseParams)
@@ -50,7 +48,6 @@ module.exports = {
       });
   },
 
-  // Show single course by ID
   show: (req, res, next) => {
     let courseId = req.params.id;
     Course.findById(courseId)
@@ -64,17 +61,17 @@ module.exports = {
       });
   },
 
-  // Render single course view
   showView: (req, res) => {
-    res.render("courses/show", { course: res.locals.course });
+    res.render("courses/show");
   },
 
-  // Render edit form for a course
   edit: (req, res, next) => {
     let courseId = req.params.id;
     Course.findById(courseId)
       .then(course => {
-        res.render("courses/edit", { course: course });
+        res.render("courses/edit", {
+          course: course
+        });
       })
       .catch(error => {
         console.log(`Error fetching course by ID: ${error.message}`);
@@ -82,32 +79,29 @@ module.exports = {
       });
   },
 
-  // Update a course
   update: (req, res, next) => {
-    let courseId = req.params.id;
-    let courseParams = {
-      title: req.body.title,
-      description: req.body.description,
-      items: req.body.items.split(","),
-      zipCode: req.body.zipCode
-    };
+    let courseId = req.params.id,
+      courseParams = {
+        title: req.body.title,
+        description: req.body.description,
+        items: [req.body.items.split(",")],
+        zipCode: req.body.zipCode
+      };
 
-
-    Course.findByIdAndUpdate(courseId, { $set: courseParams })
+    Course.findByIdAndUpdate(courseId, {
+      $set: courseParams
+    })
       .then(course => {
-        res.locals.redirect = `/ courses / ${courseId} `;
+        res.locals.redirect = `/courses/${courseId}`;
         res.locals.course = course;
         next();
       })
       .catch(error => {
-        console.log(`Error updating course by ID: ${error.message} `);
+        console.log(`Error updating course by ID: ${error.message}`);
         next(error);
       });
-
-
   },
 
-  // Delete a course
   delete: (req, res, next) => {
     let courseId = req.params.id;
     Course.findByIdAndRemove(courseId)
@@ -121,20 +115,24 @@ module.exports = {
       });
   },
 
-  // Handle redirects
   redirectView: (req, res, next) => {
     let redirectPath = res.locals.redirect;
     if (redirectPath !== undefined) res.redirect(redirectPath);
     else next();
   },
+
   respondJSON: (req, res) => {
     res.json({
-      status: httpStatus.OK,
+      status: httpStatus.OK, //Code 200
+//Take locals object from index res.locals.courses variable and display it in JSON format instead of rendering data in EJS
       data: res.locals
     });
   },
+
+//If an error occurs, respond with status code 500 instead of redirecting to another browser view/page  
   errorJSON: (error, req, res, next) => {
     let errorObject;
+
     if (error) {
       errorObject = {
         status: httpStatus.INTERNAL_SERVER_ERROR,
@@ -142,40 +140,46 @@ module.exports = {
       };
     } else {
       errorObject = {
-        status: httpStatus.INTERNAL_SERVER_ERROR,
-        message: "Unknown Error."
-      };
-    }
-    res.json(errorObject);
+      status: httpStatus.INTERNAL_SERVER_ERROR,
+      message: "Unknown Error"
+    };
+  }
+  res.json(errorObject);
   },
+
   join: (req, res, next) => {
-    let courseId = req.params.id,
-      currentUser = req.user;
-    if (currentUser) {
+    let courseId = req.params.id;
+    let currentUser = req.user;
+    
+    if (currentUser) { //check if user currently logged in
       User.findByIdAndUpdate(currentUser, {
         $addToSet: {
           courses: courseId
         }
       })
-        .then(() => {
-          res.locals.success = true;
-          next();
-        })
-        .catch(error => {
-          next(error);
-        });
+      .then( () => {
+        res.locals.success = true;
+        next();
+      })
+      .catch( error => {
+        next(error);
+      });
     } else {
-      next(new Error("User must log in."));
+      next(new Error("User must login first"));
     }
   },
+
   filterUserCourses: (req, res, next) => {
     let currentUser = res.locals.currentUser;
+
+    //Check if user is logged in
     if (currentUser) {
-      let mappedCourses = res.locals.courses.map((course) => {
-        let userJoined = currentUser.courses.some((userCourse) => {
+      let mappedCourses = res.locals.courses.map( (course) => {
+        //userJoined value is True or False
+        let userJoined = currentUser.courses.some( (userCourse) => {
           return userCourse.equals(course._id);
         });
-        return Object.assign(course.toObject(), { joined: userJoined });
+        return Object.assign(course.toObject(), {joined: userJoined});
       });
       res.locals.courses = mappedCourses;
       next();

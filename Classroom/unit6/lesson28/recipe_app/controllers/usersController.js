@@ -1,10 +1,7 @@
 "use strict";
-const { body, validationResult } = require("express-validator");
-
 
 const User = require("../models/user"),
   passport = require("passport"),
-  token = process.env.TOKEN || "recipeT0k3n",
   getUserParams = body => {
     return {
       name: {
@@ -30,19 +27,13 @@ module.exports = {
       });
   },
   indexView: (req, res) => {
-    if (req.query.format === "json") {
-      res.json(res.locals.users);     // ✅ Changed to users
-    } else {
-      res.render("users/index", {      // ✅ Changed to users/index
-        users: res.locals.users        // ✅ Pass users data
-      });
-    }
+    res.render("users/index");
   },
   new: (req, res) => {
     res.render("users/new");
   },
   create: (req, res, next) => {
-    if (req.skip) return next();
+    if (req.skip) next();
     let newUser = new User(getUserParams(req.body));
     User.register(newUser, req.body.password, (error, user) => {
       if (user) {
@@ -115,7 +106,7 @@ module.exports = {
   },
   delete: (req, res, next) => {
     let userId = req.params.id;
-    User.findByIdAndDelete(userId)  // Changed from findByIdAndRemove
+    User.findByIdAndRemove(userId)
       .then(() => {
         res.locals.redirect = "/users";
         next();
@@ -134,30 +125,28 @@ module.exports = {
     successRedirect: "/",
     successFlash: "Logged in!"
   }),
-  validate: [
-    body("email")
-      .normalizeEmail({ all_lowercase: true })
-      .trim()
-      .isEmail()
-      .withMessage("Email is invalid"),
-
-    body("zipCode")
+  validate: (req, res, next) => {
+    req
+      .sanitizeBody("email")
+      .normalizeEmail({
+        all_lowercase: true
+      })
+      .trim();
+    req.check("email", "Email is invalid").isEmail();
+    req
+      .check("zipCode", "Zip code is invalid")
       .notEmpty()
-      .withMessage("Zip code cannot be empty")
       .isInt()
-      .withMessage("Zip code must be a number")
-      .isLength({ min: 5, max: 5 })
-      .withMessage("Zip code must be 5 digits"),
+      .isLength({
+        min: 5,
+        max: 5
+      })
+      .equals(req.body.zipCode);
+    req.check("password", "Password cannot be empty").notEmpty();
 
-    body("password")
-      .notEmpty()
-      .withMessage("Password cannot be empty"),
-
-    // Validation result handler
-    (req, res, next) => {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        let messages = errors.array().map(e => e.msg);
+    req.getValidationResult().then(error => {
+      if (!error.isEmpty()) {
+        let messages = error.array().map(e => e.msg);
         req.skip = true;
         req.flash("error", messages.join(" and "));
         res.locals.redirect = "/users/new";
@@ -165,20 +154,12 @@ module.exports = {
       } else {
         next();
       }
-    }
-  ],
-  logout: (req, res, next) => {
-    req.logout((err) => {
-      if (err) {
-        return next(err);
-      }
-      req.flash("success", "You have been logged out!");
-      res.locals.redirect = "/";
-      next();
     });
   },
-  verifyToken: (req, res, next) => {
-    if (req.query.apiToken === token) next();
-    else next(new Error("Invalid API token."));
-  },
+  logout: (req, res, next) => {
+    req.logout();
+    req.flash("success", "You have been logged out!");
+    res.locals.redirect = "/";
+    next();
+  }
 };
