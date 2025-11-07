@@ -116,3 +116,58 @@ app.use("/", router); // Mounts all routes under root URL
 app.listen(app.get("port"), () => {
   console.log(`🚀 Server running at http://localhost:${app.get("port")}`); // Logs server start message
 });
+/**
+ * ===============================================================
+ * 🍽️ Confetti Cuisine Application — Main Server File
+ * ===============================================================
+ * 
+ * This file is the **main entry point** for the Confetti Cuisine web application.
+ * It sets up the Express server, connects to MongoDB via Mongoose, and registers
+ * all middleware, authentication, routes, and error handlers.
+ * 
+ * ---------------------------------------------------------------
+ * 🧩 Core Responsibilities:
+ * ---------------------------------------------------------------
+ * 1. **Server & Database Setup**
+ *    - Initializes Express and connects to MongoDB (`confetti_cuisine`).
+ *    - Configures EJS view engine and template layouts.
+ * 
+ * 2. **Middleware Configuration**
+ *    - `method-override` → Enables PUT and DELETE in HTML forms.
+ *    - `express.urlencoded` & `express.json` → Parses form and JSON data.
+ *    - `cookie-parser`, `express-session`, `connect-flash` → Handles sessions and flash messages.
+ * 
+ * 3. **Authentication**
+ *    - Configured with Passport.js using `passport-local-mongoose`.
+ *    - Supports login, logout, and session persistence for authenticated users.
+ * 
+ * 4. **Routing**
+ *    - Organized via MVC structure:
+ *      - `/` & `/contact` → Handled by `homeController`.
+ *      - `/users` → CRUD + authentication (register, login, update, delete).
+ *      - `/courses` → Full CRUD operations for course management.
+ *      - `/subscribers` → Newsletter subscription CRUD.
+ * 
+ * 5. **Error Handling**
+ *    - `errorController.pageNotFoundError` → Handles 404 routes.
+ *    - `errorController.internalServerError` → Handles 500-level errors.
+ * 
+ * 6. **Startup**
+ *    - Server listens on port 3000 (or environment-defined port).
+ *    - Logs successful MongoDB and server startup messages.
+ * 
+ * ---------------------------------------------------------------
+ * 🧠 Architecture:
+ * ---------------------------------------------------------------
+ * - **Model-View-Controller (MVC)** structure promotes clean separation:
+ *   - Models: Mongoose schemas (`User`, `Subscriber`, `Course`).
+ *   - Views: EJS templates using `express-ejs-layouts`.
+ *   - Controllers: Route logic for each entity.
+ * 
+ * ---------------------------------------------------------------
+ * ✅ Author Notes:
+ * ---------------------------------------------------------------
+ * - Suitable for deployment or further expansion with APIs.
+ * - Authentication-ready with Passport and flash messaging.
+ * - Clean, modular, and beginner-friendly Express project structure.
+ */

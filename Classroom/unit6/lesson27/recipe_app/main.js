@@ -89,3 +89,66 @@ app.use("/", router);
 app.listen(app.get("port"), () => {
   console.log(`Server running at http://localhost:${app.get("port")}`);
 });
+
+/**
+ * ===============================================================
+ * 🍽️ Confetti Cuisine — Main Server File (server.js)
+ * ===============================================================
+ * 
+ * This file is the main entry point for the Confetti Cuisine web application.
+ * It sets up the Express server, connects to MongoDB, and configures
+ * middleware, authentication, sessions, and routing.
+ * 
+ * ---------------------------------------------------------------
+ * 🧩 TECHNOLOGIES USED
+ * ---------------------------------------------------------------
+ * - **Express.js** → Web framework for creating routes and middleware.
+ * - **EJS + express-ejs-layouts** → Template engine and layout system for dynamic views.
+ * - **Mongoose** → MongoDB ODM for schema modeling and database management.
+ * - **Passport.js** → Authentication middleware for login and session handling.
+ * - **express-session + cookie-parser + connect-flash** → Manages user sessions, cookies, and flash messages.
+ * - **method-override** → Enables PUT and DELETE HTTP methods from HTML forms.
+ * - **express-validator** → Middleware for validating user inputs (older implementation style).
+ * 
+ * ---------------------------------------------------------------
+ * ⚙️ MAIN CONFIGURATION
+ * ---------------------------------------------------------------
+ * - Connects to MongoDB at `mongodb://0.0.0.0:27017/recipe_db`.
+ * - Uses EJS as the templating engine and serves static assets from `/public`.
+ * - Parses URL-encoded and JSON request bodies.
+ * - Configures session handling with secure cookie settings.
+ * - Sets up Passport.js for local authentication (via User model).
+ * 
+ * ---------------------------------------------------------------
+ * 🧭 ROUTING & CONTROLLERS
+ * ---------------------------------------------------------------
+ * - Routes are imported from `./routes/index.js` and mounted at the root (`/`).
+ * - `homeController.logRequestPaths` logs incoming request URLs.
+ * - Controllers handle modular logic for different parts of the app:
+ *    - `homeController` → Static pages & home route logic.
+ *    - `usersController` → User CRUD and authentication.
+ *    - `subscribersController` → Newsletter management.
+ *    - `coursesController` → Course CRUD and viewing.
+ * 
+ * ---------------------------------------------------------------
+ * 🚨 ERROR HANDLING
+ * ---------------------------------------------------------------
+ * - Errors and route issues are handled in `errorController.js` (not shown here).
+ * - Flash messages provide user feedback on success/failure events.
+ * 
+ * ---------------------------------------------------------------
+ * 🧠 NOTES
+ * ---------------------------------------------------------------
+ * - `expressValidator()` is used here for backward compatibility, but in modern Express,
+ *   you should use the destructured import from `express-validator` instead:
+ *   ```js
+ *   const { body, validationResult } = require("express-validator");
+ *   ```
+ *   and apply validations directly in routes or controllers.
+ * 
+ * ---------------------------------------------------------------
+ * 🚀 SERVER START
+ * ---------------------------------------------------------------
+ * - The server listens on port **3000** (or an environment-specified port).
+ * - Logs successful connection messages for MongoDB and the Express server.
+ */

@@ -159,3 +159,48 @@ app.use("/", router);
 app.listen(app.get("port"), () => {
   console.log(`Server running at http://localhost:${app.get("port")}`);
 });
+
+
+/**
+ * ==========================================
+ * Application Summary
+ * ==========================================
+ * This file is the main server setup for a Node.js web application using Express and MongoDB.
+ * 
+ * It configures the following:
+ * 
+ * 1. **Dependencies & Middleware Setup**
+ *    - Express: Web framework for handling HTTP requests and routing.
+ *    - EJS & express-ejs-layouts: Template engine for rendering dynamic views.
+ *    - Mongoose: ODM library for MongoDB integration.
+ *    - Method-Override: Allows PUT and DELETE methods from forms.
+ *    - express-session, cookie-parser, and connect-flash: Manage sessions, cookies, and flash messages.
+ * 
+ * 2. **Database Connection**
+ *    - Connects to a MongoDB database named `recipe_db`.
+ *    - Logs a message when the connection is successful.
+ * 
+ * 3. **Express Configuration**
+ *    - Sets the view engine to EJS.
+ *    - Serves static files from the `public` directory.
+ *    - Parses incoming requests (URL-encoded and JSON).
+ *    - Sets up session and flash message handling.
+ * 
+ * 4. **Routing Structure**
+ *    - `/` and `/contact`: Handled by `homeController`.
+ *    - `/users`: Full CRUD routes for user management via `usersController`.
+ *    - `/subscribers`: Full CRUD routes for subscribers via `subscribersController`.
+ *    - `/courses`: Full CRUD routes for courses via `coursesController`.
+ * 
+ * 5. **Error Handling**
+ *    - Uses centralized error middleware from `errorController` to log errors
+ *      and respond with 404 (resource not found) or 500 (internal server) pages.
+ * 
+ * 6. **Server Initialization**
+ *    - The app listens on port 3000 (or a port specified in the environment variable).
+ *    - Logs a message confirming the server is running.
+ * 
+ * This architecture promotes separation of concerns, with controllers handling
+ * the logic for each resource and middleware handling cross-cutting concerns.
+ * CRUD routes are a set of web application routes that correspond to the four fundamental operations of persistent data: Create, Read, Update, and Delete.
+ */

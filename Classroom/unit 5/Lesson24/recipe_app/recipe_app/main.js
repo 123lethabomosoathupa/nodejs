@@ -156,3 +156,65 @@ app.use("/", router);
 app.listen(app.get("port"), () => {
   console.log(`🚀 Server running at http://localhost:${app.get("port")}`);
 });
+/**
+ * ==========================================
+ * 🍽️ Confetti Cuisine App — Server Setup
+ * ==========================================
+ * CRUD routes are a set of web application routes that correspond to the four fundamental operations of persistent data: Create, Read, Update, and Delete.
+ * This file serves as the main entry point for the Confetti Cuisine web application.
+ * It sets up Express, connects to MongoDB, and defines all major configurations, middleware, and routes.
+ * 
+ * ------------------------------------------
+ * 🧩 TECHNOLOGIES USED
+ * ------------------------------------------
+ * - **Express.js**: Web server framework for handling routing and middleware.
+ * - **EJS + express-ejs-layouts**: Template engine and layout manager for views.
+ * - **Mongoose**: MongoDB ORM for defining schemas and handling data persistence.
+ * - **Passport.js**: Authentication middleware (login, session management).
+ * - **express-session + connect-flash**: Handles user sessions and flash messaging.
+ * - **express-validator**: Provides form validation for user and recipe inputs.
+ * - **method-override**: Allows HTML forms to send PUT and DELETE requests.
+ * - **cookie-parser**: Parses cookies for secure session handling.
+ * 
+ * ------------------------------------------
+ * ⚙️ MAIN CONFIGURATION
+ * ------------------------------------------
+ * - Connects to a local MongoDB database (`recipe_db`).
+ * - Configures EJS as the templating engine.
+ * - Enables static files from the `/public` directory.
+ * - Sets up middleware for form handling, JSON parsing, cookies, and sessions.
+ * - Initializes Passport for authentication (User model used as strategy).
+ * 
+ * ------------------------------------------
+ * 🧭 ROUTING OVERVIEW
+ * ------------------------------------------
+ * - `/` and `/contact`: Handled by `homeController` for basic pages.
+ * - `/users`: Full CRUD + authentication routes handled by `usersController`.
+ *   - Includes login, logout, create, update, delete, and profile viewing.
+ * - `/subscribers`: Managed via `subscribersController` for newsletter signups.
+ * - `/courses`: Managed via `coursesController` for viewing and editing courses.
+ * - `/recipes`: Includes input validation with `express-validator` before saving.
+ * 
+ * ------------------------------------------
+ * 🚨 ERROR HANDLING
+ * ------------------------------------------
+ * - Uses centralized middleware in `errorController` for:
+ *   - Logging errors to the console.
+ *   - Handling 404 (Not Found) and 500 (Internal Server) responses.
+ * 
+ * ------------------------------------------
+ * 🚀 SERVER START
+ * ------------------------------------------
+ * - Runs on port 3000 (or environment-specified port).
+ * - Logs successful connection messages for both MongoDB and Express server.
+ * 
+ * ------------------------------------------
+ * 🧠 ARCHITECTURAL NOTES
+ * ------------------------------------------
+ * This structure follows MVC (Model-View-Controller):
+ * - Models define database schemas (User, Subscriber, Course).
+ * - Controllers contain logic for handling HTTP requests.
+ * - Views (EJS templates) handle rendering user-facing pages.
+ * 
+ * The application design ensures modularity, scalability, and clean separation of concerns.
+ */
