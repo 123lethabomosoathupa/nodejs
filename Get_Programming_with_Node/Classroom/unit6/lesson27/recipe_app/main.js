@@ -20,26 +20,40 @@ const methodOverride = require("method-override"); // Support PUT/DELETE in form
 const expressSession = require("express-session"); // Session middleware
 const cookieParser = require("cookie-parser"); // Parse cookies
 const connectFlash = require("connect-flash"); // Flash messages
-const expressValidator = require("express-validator"); // Input validation (legacy style)
+
 const passport = require("passport"); // Authentication
 const homeController = require("./controllers/homeController"); // Home page controller
 const User = require("./models/user"); // User model
+// Example in a route file:
+const { body, validationResult } = require("express-validator");
 
+router.post("/users", 
+  body("email").isEmail().normalizeEmail(),
+  body("password").isLength({ min: 5 }),
+  (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      // Handle validation errors
+      req.flash("error", "Invalid input");
+      return res.redirect("back");
+    }
+    // Process valid data
+  }
+);
 // ----------------------------
 // DATABASE CONFIGURATION
 // ----------------------------
-mongoose.Promise = global.Promise; // Use native promises
+mongoose.Promise = global.Promise;
 mongoose.connect(
-  "mongodb://0.0.0.0:27017/recipe_db", // MongoDB connection string
+  "mongodb://0.0.0.0:27017/recipe_db",
   { useNewUrlParser: true }
 );
-mongoose.set("useCreateIndex", true); // Avoid deprecation warning for ensureIndex
+// mongoose.set("useCreateIndex", true); <- REMOVE THIS LINE
 
 const db = mongoose.connection;
 db.once("open", () => {
   console.log("Successfully connected to MongoDB using Mongoose!");
 });
-
 // ----------------------------
 // EXPRESS CONFIGURATION
 // ----------------------------
@@ -95,7 +109,7 @@ app.use((req, res, next) => {
 // ----------------------------
 // VALIDATION & LOGGING
 // ----------------------------
-app.use(expressValidator()); // Legacy input validation middleware
+
 app.use(homeController.logRequestPaths); // Log all incoming requests
 
 //------------------------------------------------------

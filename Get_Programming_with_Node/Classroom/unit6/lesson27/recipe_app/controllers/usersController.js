@@ -182,9 +182,13 @@ module.exports = {
 
   // Logout user
   logout: (req, res, next) => {
-    req.logout(); // Passport logout
-    req.flash("success", "You have been logged out!"); // Flash logout message
-    res.locals.redirect = "/"; // Redirect to home page
-    next(); // Call next middleware
-  }
+  req.logout((err) => {
+    if (err) {
+      return next(err);
+    }
+    req.flash("success", "You have been logged out!");
+    res.locals.redirect = "/";
+    next();
+  });
+},
 };
