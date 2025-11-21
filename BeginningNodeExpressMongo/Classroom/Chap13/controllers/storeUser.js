@@ -1,15 +1,19 @@
 const User = require('../models/User.js')
 const path = require('path')
 
-module.exports = (req,res)=>{  
-    User.create(req.body, (error, user) => {         
-        if(error){             
+module.exports = async (req, res) => {  
+    try {
+        const user = await User.create(req.body);
+        res.redirect('/');
+    } catch (error) {
+        if (error.errors) {
             const validationErrors = Object.keys(error.errors)
-              .map(key => error.errors[key].message)
-
-            req.session.validationErrors = validationErrors
-            return res.redirect('/auth/register')         
-        }         
-        res.redirect('/')         
-    })                
+                .map(key => error.errors[key].message);
+            
+            req.flash('validationErrors', validationErrors);
+        } else {
+            req.flash('validationErrors', ['An error occurred during registration']);
+        }
+        return res.redirect('/auth/register');
+    }
 }

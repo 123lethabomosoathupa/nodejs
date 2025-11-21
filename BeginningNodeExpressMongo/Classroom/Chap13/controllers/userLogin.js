@@ -14,6 +14,7 @@ module.exports = (req, res) => {
                 if (isMatch) {
                     // Save user in session
                     req.session.userId = user._id;
+                    console.log('User logged in, redirecting to home:', user._id); // Add logging
                     return res.redirect('/');
                 } else {
                     return res.render('login', { error: 'Invalid username or password' });
@@ -21,7 +22,7 @@ module.exports = (req, res) => {
             });
         })
         .catch(err => {
-            console.log(err);
+            console.log('Login error:', err);
             return res.render('login', { error: 'Something went wrong' });
         });
 };

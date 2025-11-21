@@ -1,12 +1,16 @@
 const BlogPost = require('../models/BlogPost.js');
 
 module.exports = async (req, res) => {
-    // req exists here, inside the controller function
-    console.log(req.session);
-
-    const blogposts = await BlogPost.find({});
-    
-    res.render('index', {
-        blogposts
-    });
+    try {
+        const blogposts = await BlogPost.find({});
+        
+        res.render('index', {
+            blogposts
+        });
+    } catch (error) {
+        console.error('Error fetching blog posts:', error);
+        res.render('index', {
+            blogposts: []
+        });
+    }
 };
