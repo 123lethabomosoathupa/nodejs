@@ -4,6 +4,7 @@ const path = require("path");
 const ejs = require("ejs");
 const fileUpload = require("express-fileupload");
 const expressSession = require("express-session");
+const flash = require("connect-flash");
 
 // Controllers
 const storeUserController = require("./controllers/storeUser");
@@ -54,6 +55,9 @@ app.use(
     secret: "keyboard cat",
   })
 );
+
+// Initialize flash AFTER express-session
+app.use(flash());
 
 // Make loggedIn available globally
 global.loggedIn = null;
