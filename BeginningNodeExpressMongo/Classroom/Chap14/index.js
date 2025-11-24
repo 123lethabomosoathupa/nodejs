@@ -1,13 +1,13 @@
+// Load core modules and packages
 const express = require("express");
 const app = new express();
 const path = require("path");
 const ejs = require("ejs");
 const fileUpload = require("express-fileupload");
 const expressSession = require("express-session");
-const connectFlash = require("connect-flash"); // Add this line
+const connectFlash = require("connect-flash"); // Flash messages for login errors, validation, etc.
 
-
-// Controllers
+// Controllers (each controller handles a specific route's logic)
 const storeUserController = require("./controllers/storeUser");
 const newUserController = require("./controllers/newUser");
 const loginController = require("./controllers/login");
@@ -20,60 +20,71 @@ const getPostController = require("./controllers/getPost");
 const aboutController = require('./controllers/about')
 const contactController = require('./controllers/contact')
 
-// Middleware
-const authMiddleware = require("./middleware/authMiddleware");
-const redirectIfAuthenticatedMiddleware = require("./middleware/redirectIfAuthenticatedMiddleware");
+// Middleware (custom logic executed before route handlers)
+const authMiddleware = require("./middleware/authMiddleware"); // Protects routes (only logged-in users can access)
+const redirectIfAuthenticatedMiddleware = require("./middleware/redirectIfAuthenticatedMiddleware"); // Prevent logged-in users from accessing login/register pages
 
+// Example custom middleware to test request flow
 const customMiddleWare = (req, res, next) => {
-  console.log("Custom middle ware called");
+  console.log("Custom middleware called");
   next();
 };
 
+// Middleware to validate post submission
 const validateMiddleWare = (req, res, next) => {
   if (req.files == null || req.body.title == null) {
-    return res.redirect("/posts/new");
+    return res.redirect("/posts/new"); // Redirect if file or title is missing
   }
   next();
 };
 
-// MongoDB
+// Connect to MongoDB
 const mongoose = require("mongoose");
 mongoose.connect("mongodb://localhost/my_database", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 
-// View Engine
+// View Engine (EJS templates)
 app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "public", "views"));
+app.set("views", path.join(__dirname, "public", "views")); // Template folder
 
 // Global Middleware
-app.use(express.static("public"));
-app.use(express.urlencoded({ extended: false }));
-app.use(fileUpload());
-app.use(customMiddleWare);
+app.use(express.static("public")); // Serve static files (CSS, images, JS)
+app.use(express.urlencoded({ extended: false })); // Parse form data
+app.use(fileUpload()); // Allow file uploads
+app.use(customMiddleWare); // Test middleware
 
+// Session setup
 app.use(
   expressSession({
-    secret: "keyboard cat",
+    secret: "keyboard cat", // Session encryption key
   })
 );
 
-app.use(connectFlash()); // Add this line - must come AFTER expressSession
+// Flash messages must come after session middleware
+app.use(connectFlash());
 
-// Make loggedIn available globally
+// Make the session user ID accessible everywhere (for navbar login state)
 global.loggedIn = null;
 app.use((req, res, next) => {
-  loggedIn = req.session.userId;
+  loggedIn = req.session.userId; // Save current user's ID globally
   next();
 });
 
-// Routes
+// -------------------- ROUTES -------------------- //
+
+// Home page
 app.get("/", homeController);
+
+// Single post view
 app.get("/post/:id", getPostController);
-app.get('/about', aboutController)
-app.get('/contact', contactController)
-// Auth Routes
+
+// Static pages
+app.get('/about', aboutController);
+app.get('/contact', contactController);
+
+// Authentication routes
 app.get("/auth/register", redirectIfAuthenticatedMiddleware, newUserController);
 app.post("/users/register", redirectIfAuthenticatedMiddleware, storeUserController);
 
@@ -82,14 +93,15 @@ app.post("/users/login", redirectIfAuthenticatedMiddleware, loginUserController)
 
 app.get("/auth/logout", logoutController);
 
-// Post Routes (Protected)
+// Post creation routes (protected: must be logged in)
 app.get("/posts/new", authMiddleware, newPostController);
 app.post("/posts/store", authMiddleware, validateMiddleWare, storePostController);
 
-// 404 Page
+// 404 fallback page
 app.use((req, res) => res.render("notfound"));
 
-// Server
+// Start the server
 app.listen(4000, () => {
   console.log("App listening on port 4000");
 });
+ 
